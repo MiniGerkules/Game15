@@ -34,12 +34,50 @@ namespace Numbers
     public class Game
     {
         /// <summary>
+        /// Структура, описывающая координату пустой клетки
+        /// </summary>
+        struct CoordBlock
+        {
+            /// <summary>
+            /// Координата строки
+            /// </summary>
+            public int row;
+
+            /// <summary>
+            /// Координата столбца
+            /// </summary>
+            public int column;
+
+            /// <summary>
+            /// Конструктор структуры
+            /// </summary>
+            /// <param name="row"></param>
+            /// <param name="column"></param>
+            public CoordBlock(int row, int column)
+            {
+                this.row = row;
+                this.column = column;
+            }
+        }
+
+        /// <summary>
         /// Список кнопок с числами, которые игрок должен расставить в правильном порядке
         /// </summary>
         private List<List<Button>> numbers;
 
+        /// <summary>
+        /// Координата пустой клетки
+        /// </summary>
+        CoordBlock coordEmptyBlock;
+
+        /// <summary>
+        /// Число строк в матрице
+        /// </summary>
         int rows;
 
+        /// <summary>
+        /// Число столбцов
+        /// </summary>
         int columns;
 
         /// <summary>
@@ -86,6 +124,7 @@ namespace Numbers
                     temp = new Button();
                     temp.Click += Button_Click;
                     temp.IsEnabled = false;
+                    temp.Tag = new CoordBlock(i, j);
 
                     // Добавляем кнопку в коллекции
                     numbers[i].Add(temp);
@@ -93,10 +132,7 @@ namespace Numbers
                 }
             }
 
-            // Делаем доступными кнопки у отверстия
-            numbers[rows - 1][columns - 2].IsEnabled = true;
-            numbers[rows - 2][columns - 1].IsEnabled = true;
-
+            // Перемешиваем значения
             Mix();
         }
 
@@ -128,6 +164,14 @@ namespace Numbers
                     numbers[i][j].Content = possibleValues[randIndex];
                     possibleValues.RemoveAt(randIndex);
                 }
+
+            // Делаем доступными кнопки у пустой клетки
+            numbers[rows - 1][columns - 2].IsEnabled = true;
+            numbers[rows - 2][columns - 1].IsEnabled = true;
+
+            // Устанавливаем координаты путой клетки
+            coordEmptyBlock.row = rows - 1;
+            coordEmptyBlock.column = columns - 1;
         }
 
         /// <summary>
@@ -137,10 +181,16 @@ namespace Numbers
         /// <param name="e"> Дополнительная информация </param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
+            Button block = sender as Button;
 
-            // Переставляем кости
-            
+            // Переставляем элемент на его место
+            Grid.SetRow(numbers[((CoordBlock)block.Tag).row][((CoordBlock)block.Tag).column], ((CoordBlock)block.Tag).row);
+            Grid.SetColumn(numbers[((CoordBlock)block.Tag).row][((CoordBlock)block.Tag).column], ((CoordBlock)block.Tag).column);
+
+            // Меняем координаты блоков
+            CoordBlock temp = coordEmptyBlock;
+            coordEmptyBlock = (CoordBlock)block.Tag;
+            block.Tag = temp;
 
             // Увеличиваем счетчик ходов
             counter.Content = int.Parse(counter.Content.ToString()) + 1;

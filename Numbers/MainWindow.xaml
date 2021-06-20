@@ -19,7 +19,7 @@
         
         <!-- Кнопка, позволяющая перемещать кости -->
         <Button x:Name="mixButton" Grid.Row="0" Grid.Column="0" Margin="3, 20" Click="mixButtonClick">
-            <TextBlock  TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+            <TextBlock Text="Перемешать блоки" TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
         </Button>
 
         <!-- Надпись, содержащая описание игры -->
