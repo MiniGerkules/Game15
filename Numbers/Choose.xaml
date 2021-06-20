@@ -1,0 +1,32 @@
+﻿<Window x:Class="Numbers.Choose"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Numbers"
+        mc:Ignorable="d"
+        Title="Choose" Height="200" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label Content="Выберете вариант игры" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <UniformGrid Grid.Row="1" Rows="3" Columns="4">
+            <Button x:Name="Version22" Content="2*2" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version23" Content="2*3" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version24" Content="2*4" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version25" Content="2*5" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version26" Content="2*6" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version27" Content="2*7" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version28" Content="2*8" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version33" Content="3*3" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version34" Content="3*4" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version35" Content="3*5" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version44" Content="4*4" Click="ChooseButtonClick" Margin="5"/>
+            <Button x:Name="Version55" Content="5*5" Click="ChooseButtonClick" Margin="5"/>
+        </UniformGrid>
+    </Grid>
+</Window>
