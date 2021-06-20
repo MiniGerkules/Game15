@@ -9,14 +9,31 @@
     <Grid x:Name="greed">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.2*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.8*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="0.8*"/>
+            <ColumnDefinition Width="0.1*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Кнопка, позволяющая перемещать кости -->
+        <Button x:Name="mixButton" Grid.Row="0" Grid.Column="0" Margin="3, 20" Click="mixButtonClick">
+            <TextBlock  TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+        </Button>
 
         <!-- Надпись, содержащая описание игры -->
-        <Label x:Name ="hintToPlayer" Grid.Row="0" Grid.Column="0" Content="Игра"
-                VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Label x:Name ="hintToPlayer" Grid.Row="0" Grid.Column="1" 
+                Content="Выстройте все числа в порядке возрастания за как можно меньшее количество ходов"
+                HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <!-- Надпись, содержащая количество ходов -->
+        <StackPanel x:Name="NumOfStrokes" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center">
+            <Label x:Name="help" Content="Ходов:" HorizontalAlignment="Center"/>
+            <Label x:Name="counter" Content="0" HorizontalAlignment="Center"/>
+        </StackPanel>
 
         <!-- Игровое поле -->
-        <UniformGrid x:Name="playingField" Grid.Row="1" Grid.Column="0"/>
+        <Grid x:Name="playingField" Grid.Row="1" Grid.ColumnSpan="3"/>
     </Grid>
 </Window>

@@ -12,7 +12,7 @@ namespace Numbers
     /// <summary>
     /// Перечисление, задающее варианты игры
     /// </summary>
-    enum GameOptions
+    public enum GameOptions
     {
         Version22 = 4,
         Version23 = 6,
@@ -31,48 +31,119 @@ namespace Numbers
     /// <summary>
     /// Класс, описывающий игру
     /// </summary>
-    class Game
+    public class Game
     {
         /// <summary>
         /// Список кнопок с числами, которые игрок должен расставить в правильном порядке
         /// </summary>
-        private List<Button> numbers;
+        private List<List<Button>> numbers;
+
+        int rows;
+
+        int columns;
 
         /// <summary>
-        /// Вариант игры, выбранный пользователем
+        /// Поле, содержащее количество ходов
         /// </summary>
-        private GameOptions gameOption;
+        private Label counter;
 
         /// <summary>
         /// Поле, в котором распалагаются кнопки
         /// </summary>
-        private UniformGrid gamefileld;
+        private Grid gameFileld;
 
         /// <summary>
         /// Конструктор класса Game. Инициализирует вариант игры
         /// </summary>
-        /// <param name="gameOption"> Вариант игры </param>
-        /// <param name="gamefileld"> Поле, в котором располагаются кнопки </param>
-        public Game(GameOptions gameOption, UniformGrid gamefileld)
+        /// <param name="counter"> Поле, содержащее количество ходов </param>
+        /// <param name="gameFileld"> Поле, в котором располагаются кнопки </param>
+        /// <param name="rows"> Количество строк в матрице </param>
+        /// <param name="columns"> Количество столбцов в матрице </param>
+        public Game(Label counter, Grid gameFileld, int rows, int columns)
         {
-            this.gameOption = gameOption;
-            numbers = new List<Button>((int)gameOption - 1);
-            this.gamefileld = gamefileld;
+            numbers = new List<List<Button>>((int)rows);
+            this.gameFileld = gameFileld;
+            this.counter = counter;
+            this.rows = rows;
+            this.columns = columns;
+
+            // Задаем количество строк и столбцов в таблице
+            for (int i = 0; i < rows; ++i)
+                gameFileld.RowDefinitions.Add(new RowDefinition());
+            for (int j = 0; j < columns; ++j)        
+                gameFileld.ColumnDefinitions.Add(new ColumnDefinition());
 
             Button temp;
-            for (int i = 0; i < (int)gameOption - 1; ++i)
+            for (int i = 0; i < rows; ++i)
             {
-                temp = new Button();
-                temp.Content = (i + 1).ToString();
-                temp.Click += Button_Click;
-                numbers.Add(new Button());
-                this.gamefileld.Children.Add(temp);
+                numbers.Add(new List<Button>((int)columns));
+                for (int j = 0; j < columns; ++j)
+                {
+                    if ((i == rows - 1) && (j == columns - 1))
+                        continue;
+                    
+                    // Инициализируем кнопку
+                    temp = new Button();
+                    temp.Click += Button_Click;
+                    temp.IsEnabled = false;
+
+                    // Добавляем кнопку в коллекции
+                    numbers[i].Add(temp);
+                    this.gameFileld.Children.Add(temp);
+                }
             }
+
+            // Делаем доступными кнопки у отверстия
+            numbers[rows - 1][columns - 2].IsEnabled = true;
+            numbers[rows - 2][columns - 1].IsEnabled = true;
+
+            Mix();
         }
 
+        /// <summary>
+        /// Метод, перемешивающий кости на поле
+        /// </summary>
+        public void Mix()
+        {
+            Random rand = new Random();
+            int randIndex;
+
+            // Записываем все возможные значения
+            List<int> possibleValues = new List<int>(rows * columns - 1);
+            for (int i = 1; i < rows * columns; ++i)
+                possibleValues.Add(i);
+
+            for (int i = 0; i < rows; ++i)
+                for (int j = 0; j < columns; ++j)
+                {
+                    if ((i == rows - 1) && (j == columns - 1))
+                        continue;
+
+                    // Ставим элемент на его место
+                    Grid.SetRow(numbers[i][j], i);
+                    Grid.SetColumn(numbers[i][j], j);
+
+                    // Выбираем случайный индекс. По этому индексу из списка possibleValues выбираем значение
+                    randIndex = rand.Next(0, possibleValues.Count);
+                    numbers[i][j].Content = possibleValues[randIndex];
+                    possibleValues.RemoveAt(randIndex);
+                }
+        }
+
+        /// <summary>
+        /// Метод, вызываемый при перемещении кости по игровому полю
+        /// </summary>
+        /// <param name="sender"> Объект, вызывающий метод </param>
+        /// <param name="e"> Дополнительная информация </param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            Button button = sender as Button;
+
+            // Переставляем кости
+            
+
+            // Увеличиваем счетчик ходов
+            counter.Content = int.Parse(counter.Content.ToString()) + 1;
         }
     }
 }

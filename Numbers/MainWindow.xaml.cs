@@ -26,19 +26,48 @@ namespace Numbers
         private Game game;
 
         /// <summary>
+        /// Вариант игры, выбранный пользователем
+        /// </summary>
+        private GameOptions gameOptions;
+
+        /// <summary>
         /// Окно, в котором пользователь выбирает вариант игры
         /// </summary>
-        Choose choose;
+        private Choose choose;
 
+        /// <summary>
+        /// Делегат, вызываемый, когда пользователь выбирает вариант игры
+        /// </summary>
+        private Action<int, int> action;
+
+        /// <summary>
+        /// Конструктор класса MainWindow
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
+            action = new Action<int, int>(OptionChosen);
 
-            choose = new Choose();
-            choose.Owner = this;
+            choose = new Choose(action);
             choose.ShowDialog();
-
-            game = new Game(, playingField);
         }
+
+        /// <summary>
+        /// Метод, задающий вариант игры
+        /// </summary>
+        /// <param name="rows"> Количество строк </param>
+        /// <param name="columns"> Количество столбцов </param>
+        private void OptionChosen(int rows, int columns)
+        {
+            choose.Close();
+            game = new Game(counter, playingField, rows, columns);
+        }
+
+        /// <summary>
+        /// Метод, вызываемый при нажатии на кнопку перемешивания
+        /// </summary>
+        /// <param name="sender"> Объект, вызывающий метод </param>
+        /// <param name="e"> Дополнительная информация </param>
+        private void mixButtonClick(object sender, RoutedEventArgs e) => game.Mix();
     }
 }
