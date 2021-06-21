@@ -2,32 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
 
 namespace Numbers
 {
-    /// <summary>
-    /// Перечисление, задающее варианты игры
-    /// </summary>
-    public enum GameOptions
-    {
-        Version22 = 4,
-        Version23 = 6,
-        Version24 = 8,
-        Version25 = 10,
-        Version26 = 12,
-        Version27 = 14,
-        Version28 = 16,
-        Version33 = 9,
-        Version34 = 12,
-        Version35 = 15,
-        Version44 = 16,
-        Version55 = 25
-    }
-
     /// <summary>
     /// Класс, описывающий игру
     /// </summary>
@@ -66,9 +43,9 @@ namespace Numbers
         private List<List<Button>> numbers;
 
         /// <summary>
-        /// Координата пустой клетки
+        /// Пустой блок
         /// </summary>
-        CoordBlock coordEmptyBlock;
+        CoordBlock emptyBlock;
 
         /// <summary>
         /// Число строк в матрице
@@ -105,11 +82,7 @@ namespace Numbers
             this.rows = rows;
             this.columns = columns;
 
-            // Задаем количество строк и столбцов в таблице
-            for (int i = 0; i < rows; ++i)
-                gameFileld.RowDefinitions.Add(new RowDefinition());
-            for (int j = 0; j < columns; ++j)        
-                gameFileld.ColumnDefinitions.Add(new ColumnDefinition());
+            GridInit();
 
             Button temp;
             for (int i = 0; i < rows; ++i)
@@ -117,23 +90,43 @@ namespace Numbers
                 numbers.Add(new List<Button>((int)columns));
                 for (int j = 0; j < columns; ++j)
                 {
-                    if ((i == rows - 1) && (j == columns - 1))
-                        continue;
-                    
                     // Инициализируем кнопку
                     temp = new Button();
                     temp.Click += Button_Click;
-                    temp.IsEnabled = false;
                     temp.Tag = new CoordBlock(i, j);
+
+                    // Ставим элемент на его место
+                    SetRowAndColumnForBlock(temp);
 
                     // Добавляем кнопку в коллекции
                     numbers[i].Add(temp);
-                    this.gameFileld.Children.Add(temp);
+                    gameFileld.Children.Add(temp);
                 }
             }
 
             // Перемешиваем значения
             Mix();
+        }
+
+        /// <summary>
+        /// Метод, инициализирующий строки и столбцы игрового поля
+        /// </summary>
+        private void GridInit()
+        {
+            // Задаем количество строк и столбцов в таблице
+            for (int i = 0; i < rows; ++i)
+                gameFileld.RowDefinitions.Add(new RowDefinition());
+            for (int j = 0; j < columns; ++j)
+                gameFileld.ColumnDefinitions.Add(new ColumnDefinition());
+        }
+        
+        /// <summary>
+        /// Метод устанавливает блок на его место в Grid
+        /// </summary>
+        private void SetRowAndColumnForBlock(Button block)
+        {
+            Grid.SetRow(block, ((CoordBlock)block.Tag).row);
+            Grid.SetColumn(block, ((CoordBlock)block.Tag).column);
         }
 
         /// <summary>
@@ -153,25 +146,24 @@ namespace Numbers
                 for (int j = 0; j < columns; ++j)
                 {
                     if ((i == rows - 1) && (j == columns - 1))
-                        continue;
+                    {
+                        numbers[i][j].Content = "--";
+                        emptyBlock = new CoordBlock(i, j);
+                    }
+                    else
+                    {
+                        // Выбираем случайный индекс. По этому индексу из списка possibleValues выбираем значение
+                        randIndex = rand.Next(0, possibleValues.Count);
+                        numbers[i][j].Content = possibleValues[randIndex];
+                        possibleValues.RemoveAt(randIndex);
+                    }
 
-                    // Ставим элемент на его место
-                    Grid.SetRow(numbers[i][j], i);
-                    Grid.SetColumn(numbers[i][j], j);
-
-                    // Выбираем случайный индекс. По этому индексу из списка possibleValues выбираем значение
-                    randIndex = rand.Next(0, possibleValues.Count);
-                    numbers[i][j].Content = possibleValues[randIndex];
-                    possibleValues.RemoveAt(randIndex);
+                    numbers[i][j].IsEnabled = false;
                 }
 
             // Делаем доступными кнопки у пустой клетки
             numbers[rows - 1][columns - 2].IsEnabled = true;
             numbers[rows - 2][columns - 1].IsEnabled = true;
-
-            // Устанавливаем координаты путой клетки
-            coordEmptyBlock.row = rows - 1;
-            coordEmptyBlock.column = columns - 1;
         }
 
         /// <summary>
@@ -181,16 +173,23 @@ namespace Numbers
         /// <param name="e"> Дополнительная информация </param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Button block = sender as Button;
+            CoordBlock blockCoord = (CoordBlock)(sender as Button).Tag;
 
-            // Переставляем элемент на его место
-            Grid.SetRow(numbers[((CoordBlock)block.Tag).row][((CoordBlock)block.Tag).column], ((CoordBlock)block.Tag).row);
-            Grid.SetColumn(numbers[((CoordBlock)block.Tag).row][((CoordBlock)block.Tag).column], ((CoordBlock)block.Tag).column);
+            // Меняем теги блоков
+            numbers[emptyBlock.row][emptyBlock.column].Tag = blockCoord;
+            numbers[blockCoord.row][blockCoord.column].Tag = emptyBlock;
 
-            // Меняем координаты блоков
-            CoordBlock temp = coordEmptyBlock;
-            coordEmptyBlock = (CoordBlock)block.Tag;
-            block.Tag = temp;
+            // Переставляем ячейки
+            Button temp = numbers[blockCoord.row][blockCoord.column];
+            numbers[blockCoord.row][blockCoord.column] = numbers[emptyBlock.row][emptyBlock.column];
+            numbers[emptyBlock.row][emptyBlock.column] = temp;
+
+            // Отображаем перестановку на Grid
+            SetRowAndColumnForBlock(numbers[blockCoord.row][blockCoord.column]);
+            SetRowAndColumnForBlock(numbers[emptyBlock.row][emptyBlock.column]);
+
+            // Меняем координату пустого блока
+            emptyBlock = blockCoord;
 
             // Увеличиваем счетчик ходов
             counter.Content = int.Parse(counter.Content.ToString()) + 1;

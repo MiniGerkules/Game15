@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Numbers
 {
@@ -45,40 +35,40 @@ namespace Numbers
 
             switch (button.Name)
             {
-                case ("Version22"):
+                case "Version22":
                     ButtonChosen.Invoke(2, 2);
                     break;
-                case ("Version23"):
+                case "Version23":
                     ButtonChosen.Invoke(2, 3);
                     break;
-                case ("Version24"):
+                case "Version24":
                     ButtonChosen.Invoke(2, 4);
                     break;
-                case ("Version25"):
+                case "Version25":
                     ButtonChosen.Invoke(2, 5);
                     break;
-                case ("Version26"):
+                case "Version26":
                     ButtonChosen.Invoke(2, 6);
                     break;
-                case ("Version27"):
+                case "Version27":
                     ButtonChosen.Invoke(2, 7);
                     break;
-                case ("Version28"):
+                case "Version28":
                     ButtonChosen.Invoke(2, 8);
                     break;
-                case ("Version33"):
+                case "Version33":
                     ButtonChosen.Invoke(3, 3);
                     break;
-                case ("Version34"):
+                case "Version34":
                     ButtonChosen.Invoke(3, 4);
                     break;
-                case ("Version35"):
+                case "Version35":
                     ButtonChosen.Invoke(3, 5);
                     break;
-                case ("Version44"):
+                case "Version44":
                     ButtonChosen.Invoke(4, 4);
                     break;
-                case ("Version55"):
+                case "Version55":
                     ButtonChosen.Invoke(5, 5);
                     break;
             }
