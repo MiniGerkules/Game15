@@ -68,19 +68,26 @@ namespace Numbers
         private Grid gameFileld;
 
         /// <summary>
+        /// Событие, возникающее, когда игрок выиграл
+        /// </summary>
+        private event Action playerWon;
+
+        /// <summary>
         /// Конструктор класса Game. Инициализирует вариант игры
         /// </summary>
         /// <param name="counter"> Поле, содержащее количество ходов </param>
         /// <param name="gameFileld"> Поле, в котором располагаются кнопки </param>
         /// <param name="rows"> Количество строк в матрице </param>
         /// <param name="columns"> Количество столбцов в матрице </param>
-        public Game(Label counter, Grid gameFileld, int rows, int columns)
+        /// <param name="playerWon"> Делегат, вызываемый в случае выигрыша игрока </param>
+        public Game(Label counter, Grid gameFileld, int rows, int columns, Action playerWon)
         {
             numbers = new List<List<Button>>((int)rows);
             this.gameFileld = gameFileld;
             this.counter = counter;
             this.rows = rows;
             this.columns = columns;
+            this.playerWon += playerWon;
 
             GridInit();
 
@@ -161,9 +168,15 @@ namespace Numbers
                     numbers[i][j].IsEnabled = false;
                 }
 
-            // Делаем доступными кнопки у пустой клетки
-            numbers[rows - 1][columns - 2].IsEnabled = true;
-            numbers[rows - 2][columns - 1].IsEnabled = true;
+            // Проверяем на расстановку, когда уже все правильно расставлено
+            if (PlayerWon())
+                Mix();
+            else
+            {
+                // Делаем доступными кнопки у пустой клетки
+                numbers[rows - 1][columns - 2].IsEnabled = true;
+                numbers[rows - 2][columns - 1].IsEnabled = true;
+            }
         }
 
         /// <summary>
@@ -174,6 +187,9 @@ namespace Numbers
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             CoordBlock blockCoord = (CoordBlock)(sender as Button).Tag;
+
+            // Блокируем ранее активные кнопки
+            ActivateBlocks(false);
 
             // Меняем теги блоков
             numbers[emptyBlock.row][emptyBlock.column].Tag = blockCoord;
@@ -191,8 +207,53 @@ namespace Numbers
             // Меняем координату пустого блока
             emptyBlock = blockCoord;
 
+            // Активизируем новые кнопки, которые можно двигать
+            ActivateBlocks(true);
+
             // Увеличиваем счетчик ходов
             counter.Content = int.Parse(counter.Content.ToString()) + 1;
+
+            // Проверяем выиграл ли пользователь или нет
+            if (PlayerWon())
+                playerWon.Invoke();
+        }
+
+        /// <summary>
+        /// Метод, активизирующий или блокирующий кнопки вокруг пустой
+        /// </summary>
+        /// <param name="state"> Состояние, в которое переводятся блоки (true -- активировать, 
+        /// false -- заблокировать) </param>
+        private void ActivateBlocks(bool state)
+        {
+            if (emptyBlock.row + 1 < rows)
+                numbers[emptyBlock.row + 1][emptyBlock.column].IsEnabled = state;
+            if (emptyBlock.row - 1 >= 0)
+                numbers[emptyBlock.row - 1][emptyBlock.column].IsEnabled = state;
+            if (emptyBlock.column + 1 < columns)
+                numbers[emptyBlock.row][emptyBlock.column + 1].IsEnabled = state;
+            if (emptyBlock.column - 1 >= 0)
+                numbers[emptyBlock.row][emptyBlock.column - 1].IsEnabled = state;
+        }
+
+        /// <summary>
+        /// Метод, определяющий, выиграл ли игрок или нет
+        /// </summary>
+        /// <returns> Булево значение, показывающее выиграл игрок или нет (true -- выиграл, 
+        /// false -- еще нет) </returns>
+        private bool PlayerWon()
+        {
+            List<int> blocks = new List<int>(rows * columns - 1);
+
+            for (int i = 0; i < rows; ++i)
+                for (int j = 0; j < columns; ++j)
+                    if (numbers[i][j].Content.ToString() != "--")
+                        blocks.Add(int.Parse(numbers[i][j].Content.ToString()));
+
+            for (int i = 1; i < blocks.Count; ++i)
+                if (blocks[i] != blocks[i - 1] + 1)
+                    return false;
+
+            return true;
         }
     }
 }

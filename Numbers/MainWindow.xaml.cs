@@ -24,12 +24,18 @@ namespace Numbers
         private Action<int, int> action;
 
         /// <summary>
+        /// Делегат, вызываемый, когда пользователь выигрывает в игре
+        /// </summary>
+        private Action playerWon;
+
+        /// <summary>
         /// Конструктор класса MainWindow
         /// </summary>
         public MainWindow()
         {
             InitializeComponent();
             action = new Action<int, int>(OptionChosen);
+            playerWon = new Action(EndOfGame);
 
             choose = new Choose(action);
             _ = choose.ShowDialog();
@@ -46,7 +52,33 @@ namespace Numbers
         {
             choose.Close();
             choose = null;
-            game = new Game(counter, playingField, rows, columns);
+            game = new Game(counter, playingField, rows, columns, playerWon);
+        }
+
+        /// <summary>
+        /// Метод, завершающий программу или делающий новый круг
+        /// </summary>
+        private void EndOfGame()
+        {
+            MessageBoxResult result = MessageBox.Show("Хотите еще раз сыграть?", "Сыграть еще", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                // Очищаем игровое поле
+                playingField.Children.Clear();
+                playingField.RowDefinitions.Clear();
+                playingField.ColumnDefinitions.Clear();
+
+                // Обнуляем счетчик ходов
+                counter.Content = "0";
+
+                // Позволяем выбрать пользователю новую игру
+                choose = new Choose(action);
+                _ = choose.ShowDialog();
+                if (choose != null)
+                    Close();
+            }
+            else
+                Close();
         }
 
         /// <summary>
